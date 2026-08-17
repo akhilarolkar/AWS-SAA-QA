@@ -1,0 +1,388 @@
+:root {
+    --bg-color: #fcfcfc;
+    --surface-color: #ffffff;
+    --text-primary: #230046; /* Deep purple */
+    --text-secondary: #52525b;
+    --accent-orange: #d97000; /* Amber/Orange */
+    --btn-bg: #230046;
+    --btn-hover: #17002e;
+    --border-color: #e4e4e7;
+    
+    --correct-color: #059669;
+    --correct-bg: #ecfdf5;
+    --incorrect-color: #dc2626;
+    --incorrect-bg: #fef2f2;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Subtle vertical grid lines mimicking the screenshot */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: repeating-linear-gradient(to right, transparent, transparent 79px, rgba(0,0,0,0.02) 79px, rgba(0,0,0,0.02) 80px);
+    pointer-events: none;
+}
+
+.background-shapes {
+    display: none; /* Hide old dark mode blob shapes */
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem; /* Mobile padding */
+}
+
+header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; /* Mobile font size */
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+header h1 .accent-text {
+    color: var(--accent-orange);
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: 1.15rem;
+    max-width: 500px;
+    margin: 0 auto;
+    font-weight: 400;
+}
+
+/* Cards (Forms and Questions) */
+.glass-panel, .question-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem; /* Mobile padding */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    margin-bottom: 2rem;
+    transition: box-shadow 0.3s ease;
+}
+
+.question-card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+input[type="text"], textarea {
+    width: 100%;
+    background: #fafafa;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    resize: vertical;
+}
+
+input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(35, 0, 70, 0.1);
+}
+
+.correct-answer-selector {
+    display: flex;
+    flex-wrap: wrap; /* Prevent overflow on small screens */
+    gap: 1rem 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.correct-answer-selector label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+input[type="radio"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+
+input[type="radio"]:checked {
+    border-color: var(--accent-orange);
+    border-width: 6px;
+}
+
+.btn-primary {
+    background: var(--btn-bg);
+    color: #fff;
+    border: none;
+    padding: 0.85rem 2rem;
+    border-radius: 9999px; /* Pill shape */
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.btn-primary:hover {
+    background: var(--btn-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(35, 0, 70, 0.2);
+}
+
+/* Questions List */
+.quiz-options {
+    list-style: none;
+    margin-bottom: 1rem;
+}
+
+.quiz-option {
+    padding: 1rem 1.2rem;
+    background: #fafafa;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.quiz-option:hover {
+    background: #ffffff;
+    border-color: #c4c4c8;
+}
+
+.quiz-option.correct {
+    border-color: var(--correct-color);
+    background: var(--correct-bg);
+}
+
+.quiz-option.incorrect {
+    border-color: var(--incorrect-color);
+    background: var(--incorrect-bg);
+}
+
+.quiz-option .indicator {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: #ffffff;
+    flex-shrink: 0;
+}
+
+.quiz-option.correct .indicator {
+    border-color: var(--correct-color);
+    background: var(--correct-color);
+    color: #fff;
+}
+
+.quiz-option.incorrect .indicator {
+    border-color: var(--incorrect-color);
+    background: var(--incorrect-color);
+    color: #fff;
+}
+
+.explanation-box {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #fafafa;
+    border-left: 4px solid var(--accent-orange);
+    border-radius: 0 8px 8px 0;
+    display: none;
+}
+
+.explanation-box.show {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+.explanation-box h4 {
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.delete-btn {
+    margin-top: 1.5rem;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.delete-btn:hover {
+    color: var(--incorrect-color);
+    text-decoration: underline;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 3rem 0;
+    font-style: italic;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Collapsible UI */
+.card-header, .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    cursor: pointer;
+    user-select: none;
+}
+
+.panel-header h2, .card-header h3 {
+    margin-bottom: 0;
+    padding-right: 1rem;
+}
+
+.toggle-icon {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    padding-top: 0.3rem;
+}
+
+.card-content, .panel-content {
+    margin-top: 1.5rem;
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.collapsed .card-content, .collapsed .panel-content {
+    display: none;
+}
+
+/* Desktop Styles & Pagination */
+@media (min-width: 768px) {
+    .container {
+        padding: 4rem 1.5rem;
+    }
+    header h1 {
+        font-size: 3.5rem;
+    }
+    .glass-panel, .question-card {
+        padding: 2.5rem;
+    }
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.pagination button {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.pagination button:hover:not(:disabled) {
+    background: #f4f4f5;
+    border-color: #d4d4d8;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}

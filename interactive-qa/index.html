@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Solutions Architect Interactive Q&A</title>
+    <meta name="description" content="An interactive web application to daily practice and save AWS Solutions Architect Exam questions.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>AWS Solutions Architect <span class="accent-text">Q&A</span></h1>
+            <!-- <p>Master AWS. Build Resilience. Grow your Cloud Skills.</p> -->
+        </header>
+
+        <main>
+            <section class="add-question-section glass-panel collapsible-panel">
+                <div class="panel-header" onclick="const p=this.parentElement; p.classList.toggle('collapsed'); this.querySelector('.toggle-icon').innerHTML = p.classList.contains('collapsed') ? '▼' : '▲';">
+                    <h2>Add a New Question</h2>
+                    <span class="toggle-icon">▲</span>
+                </div>
+                <div class="panel-content">
+                    <form id="question-form">
+                    <div class="form-group">
+                        <label for="raw-text">Paste Full Question (including A., B., C., D. options)</label>
+                        <textarea id="raw-text" rows="10" required placeholder="Paste the full question text including A., B., C., D. options here..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Correct Answer</label>
+                        <div class="correct-answer-selector">
+                            <label><input type="radio" name="correct-option" value="0" required> A</label>
+                            <label><input type="radio" name="correct-option" value="1"> B</label>
+                            <label><input type="radio" name="correct-option" value="2"> C</label>
+                            <label><input type="radio" name="correct-option" value="3"> D</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="explanation-text">Explanation (Optional)</label>
+                        <textarea id="explanation-text" rows="3" placeholder="Why is this the correct answer?"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Add Question to Bank</button>
+                </form>
+                </div>
+            </section>
+
+            <section class="questions-list-section">
+                <h2>Your Study Bank</h2>
+                <div id="questions-container">
+                    <!-- Questions will be injected here dynamically -->
+                </div>
+                <div id="pagination-controls" class="pagination"></div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
