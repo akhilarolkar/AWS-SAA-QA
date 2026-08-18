@@ -255,9 +255,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             cardContent.appendChild(explanationDiv);
 
+            const actionButtonsDiv = document.createElement('div');
+            actionButtonsDiv.style.display = 'flex';
+            actionButtonsDiv.style.justifyContent = 'space-between';
+            actionButtonsDiv.style.alignItems = 'center';
+            actionButtonsDiv.style.marginTop = '1.5rem';
+
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'clear-btn';
+            clearBtn.innerText = 'Clear Selection';
+            clearBtn.style.marginTop = '0';
+            clearBtn.addEventListener('click', () => {
+                answered = false;
+                selectedCorrectCount = 0;
+                hasAnsweredWrong = false;
+                
+                const allOptions = optionsList.querySelectorAll('.quiz-option');
+                allOptions.forEach((optEl, idx) => {
+                    optEl.classList.remove('correct', 'incorrect');
+                    optEl.querySelector('.indicator').innerHTML = String.fromCharCode(65 + idx);
+                });
+                
+                explanationDiv.classList.remove('show');
+            });
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.innerText = 'Delete Question';
+            deleteBtn.style.marginTop = '0';
             deleteBtn.addEventListener('click', async () => {
                 if(confirm('Are you sure you want to delete this question?')) {
                     try {
@@ -269,7 +294,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
-            cardContent.appendChild(deleteBtn);
+
+            actionButtonsDiv.appendChild(clearBtn);
+            actionButtonsDiv.appendChild(deleteBtn);
+            cardContent.appendChild(actionButtonsDiv);
 
             card.appendChild(cardContent);
             questionsContainer.appendChild(card);
