@@ -72,11 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const rawText = document.getElementById('raw-text').value;
-        const correctOptionInput = document.querySelector('input[name="correct-option"]:checked');
+        const correctOptionInputs = document.querySelectorAll('input[name="correct-option"]:checked');
         const explanationText = document.getElementById('explanation-text').value;
 
-        if (!correctOptionInput) {
-            alert('Please select the correct answer.');
+        if (correctOptionInputs.length === 0) {
+            alert('Please select at least one correct answer.');
             return;
         }
 
@@ -87,12 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const correctIndex = parseInt(correctOptionInput.value);
+        const correctIndexes = Array.from(correctOptionInputs).map(input => parseInt(input.value));
 
         const newQuestion = {
             text: parsed.question,
             options: parsed.options,
-            correctIndex: correctIndex,
+            correctIndexes: correctIndexes,
             explanation: explanationText,
             createdAt: serverTimestamp() // Let Firebase handle the timestamp automatically
         };
@@ -108,32 +108,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function parseRawQuestion(text) {
-        const regexA = /(?:^|\n)\s*A[\.\)]\s/;
-        const regexB = /(?:^|\n)\s*B[\.\)]\s/;
-        const regexC = /(?:^|\n)\s*C[\.\)]\s/;
-        const regexD = /(?:^|\n)\s*D[\.\)]\s/;
+        const regexes = [
+            /(?:^|\n)\s*A[\.\)]\s/,
+            /(?:^|\n)\s*B[\.\)]\s/,
+            /(?:^|\n)\s*C[\.\)]\s/,
+            /(?:^|\n)\s*D[\.\)]\s/,
+            /(?:^|\n)\s*E[\.\)]\s/,
+            /(?:^|\n)\s*F[\.\)]\s/
+        ];
 
-        const matchA = text.match(regexA);
-        const matchB = text.match(regexB);
-        const matchC = text.match(regexC);
-        const matchD = text.match(regexD);
+        const matches = regexes.map(r => text.match(r));
 
-        if (!matchA || !matchB || !matchC || !matchD) return null;
+        if (!matches[0] || !matches[1]) return null;
 
-        const idxA = matchA.index;
-        const idxB = matchB.index;
-        const idxC = matchC.index;
-        const idxD = matchD.index;
+        const options = [];
+        const questionEndIndex = matches[0].index;
+        const question = text.substring(0, questionEndIndex).trim();
 
-        const question = text.substring(0, idxA).trim();
-        const optA = text.substring(idxA + matchA[0].length, idxB).trim();
-        const optB = text.substring(idxB + matchB[0].length, idxC).trim();
-        const optC = text.substring(idxC + matchC[0].length, idxD).trim();
-        const optD = text.substring(idxD + matchD[0].length).trim();
+        for (let i = 0; i < matches.length; i++) {
+            if (!matches[i]) break;
+            
+            const startIndex = matches[i].index + matches[i][0].length;
+            
+            // Find the end index which is either the start of the next match or the end of the string
+            let endIndex = text.length;
+            for (let j = i + 1; j < matches.length; j++) {
+                if (matches[j]) {
+                    endIndex = matches[j].index;
+                    break;
+                }
+            }
+            
+            options.push(text.substring(startIndex, endIndex).trim());
+        }
 
         return {
             question: question,
-            options: [optA, optB, optC, optD]
+            options: options
         };
     }
 
@@ -182,6 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let answered = false;
             const optionsArray = q.options || [];
+            
+            const correctAnswers = q.correctIndexes || (q.correctIndex !== undefined ? [q.correctIndex] : []);
+            let selectedCorrectCount = 0;
+            let hasAnsweredWrong = false;
 
             optionsArray.forEach((optText, optIndex) => {
                 const li = document.createElement('li');
@@ -197,21 +212,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.appendChild(textNode);
 
                 li.addEventListener('click', () => {
-                    if (answered) return;
-                    answered = true;
+                    if (answered || li.classList.contains('correct') || li.classList.contains('incorrect')) return;
 
-                    const allOptions = optionsList.querySelectorAll('.quiz-option');
-                    allOptions.forEach((optEl, i) => {
-                        if (i === q.correctIndex) {
-                            optEl.classList.add('correct');
-                            optEl.querySelector('.indicator').innerHTML = '✓';
-                        } else if (i === optIndex) {
-                            optEl.classList.add('incorrect');
-                            optEl.querySelector('.indicator').innerHTML = '✗';
-                        }
-                    });
+                    if (correctAnswers.includes(optIndex)) {
+                        li.classList.add('correct');
+                        li.querySelector('.indicator').innerHTML = '✓';
+                        selectedCorrectCount++;
+                    } else {
+                        li.classList.add('incorrect');
+                        li.querySelector('.indicator').innerHTML = '✗';
+                        hasAnsweredWrong = true;
+                    }
 
-                    explanationDiv.classList.add('show');
+                    // Show explanation if they got it wrong, or if they found all correct options
+                    if (hasAnsweredWrong || selectedCorrectCount === correctAnswers.length) {
+                        answered = true;
+                        
+                        // Reveal all remaining options
+                        const allOptions = optionsList.querySelectorAll('.quiz-option');
+                        allOptions.forEach((optEl, i) => {
+                            if (correctAnswers.includes(i) && !optEl.classList.contains('correct')) {
+                                optEl.classList.add('correct');
+                                optEl.querySelector('.indicator').innerHTML = '✓';
+                            }
+                        });
+
+                        explanationDiv.classList.add('show');
+                    }
                 });
 
                 optionsList.appendChild(li);
@@ -223,7 +250,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (q.explanation && q.explanation.trim() !== '') {
                 explanationDiv.innerHTML = `<h4>Explanation</h4><p>${q.explanation.replace(/\n/g, '<br>')}</p>`;
             } else {
-                explanationDiv.innerHTML = `<h4>Correct Answer: ${String.fromCharCode(65 + q.correctIndex)}</h4>`;
+                const correctLetters = correctAnswers.map(idx => String.fromCharCode(65 + idx)).join(', ');
+                explanationDiv.innerHTML = `<h4>Correct Answer: ${correctLetters}</h4>`;
             }
             cardContent.appendChild(explanationDiv);
 
